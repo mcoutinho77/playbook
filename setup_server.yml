@@ -1,0 +1,73 @@
+---
+ - name: Configuar Servidor Debian para aplicatvo crítica
+
+   hosts: all
+
+   become: true
+
+
+   tasks:
+
+     - name: Instalar curl, vim e htop
+
+       apt:
+
+         name:
+
+           - curl
+
+           - vim
+
+           - htop
+
+        state: present
+
+        update_cache: yes
+
+
+     - name: Configurar UTC
+
+       timezone:
+
+     - name: Habilitar IP forward
+
+       sysctl:
+
+        name: net.ipv4.ip_forward
+
+        value: '1'
+
+        reload: yes
+
+        state: present
+
+
+     - name: Instalar UFW
+
+       ufw:
+
+        name: ufw
+
+        state: present
+
+        update_cache: yes
+
+
+     - name: Permitir SSH no UFW
+
+        ufw:
+
+         state: enable
+
+         rule: allow
+
+         name: OpenSSH
+
+
+     - name: Reiniciar UFW
+
+       service:
+
+       name: ufw
+
+       state: restarted

@@ -1,0 +1,52 @@
+---
+- name: Configurar servidor Debian para aplicação crítica
+  hosts: all
+  become: true
+  tasks:
+    # Instalar ferramentas administrativas essenciais
+    - name: Instalar curl, vim e htop
+      apt:
+        name:
+          - curl
+          - vim
+          - htop
+        state: present
+        update_cache: yes
+
+    # Instalar o servidor OpenSSH
+    - name: Instalar o servidor OpenSSH
+      apt:
+        name: openssh-server
+        state: present
+
+    # Instalar o UFW
+    - name: Instalar UFW
+      apt:
+        name: ufw
+        state: present
+
+    # Configurar o fuso horário para UTC
+    - name: Configurar fuso horário para UTC
+      timezone:
+        name: UTC
+
+    # Habilitar o encaminhamento IPv4 no kernel
+    - name: Habilitar o encaminhamento IPv4 no kernel
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        reload: yes
+
+    # Configurar o firewall UFW para permitir tráfego SSH (usando perfil OpenSSH)
+    - name: Configurar o firewall UFW para OpenSSH
+      ufw:
+        state: enabled
+        rule: allow
+        name: OpenSSH
+
+    # Reiniciar o serviço UFW para garantir que as configurações entrem em vigor
+    - name: Reiniciar o serviço UFW
+      service:
+        name: ufw
+        state: restarted
